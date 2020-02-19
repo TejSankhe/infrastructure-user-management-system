@@ -1,5 +1,4 @@
 # Cloud formation script
-Foobar is a Python library for dealing with word pluralization.
 
 ## Setup
 
