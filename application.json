@@ -445,17 +445,10 @@
 						"Statement": [{
 							"Effect": "Allow",
 							"Action": ["s3:GetObject", "s3:DeleteObject", "s3:PutObject"],
-							"Resource": [{
-									"Fn::Join": ["-", ["arn:aws:s3:::", {
-										"Ref": "myS3Bucket"
-									}]]
-								},
-								{
-									"Fn::Join": ["-", ["arn:aws:s3:::", {
-										"Ref": "myS3Bucket"
-									}, "/*"]]
-								}
-							]
+                  "Resource":[
+                    {"Fn::Join" : [ "", [ "arn:aws:s3:::",{ "Ref": "myS3Bucket" }] ]},
+                    {"Fn::Join" : [ "", [ "arn:aws:s3:::",{ "Ref": "myS3Bucket" },"/*"] ]}
+                  ]
 						}]
 					}
 				}]
