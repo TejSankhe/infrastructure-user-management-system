@@ -13,10 +13,6 @@
          "Description":"AWS Region for the stack",
          "Type":"String"
       },
-      "AWSAccountId":{
-         "Description":"AWS AccountId for the stack",
-         "Type":"String"
-      },
       "VPCName":{
          "Description":"VPC Name",
          "Type":"String"
