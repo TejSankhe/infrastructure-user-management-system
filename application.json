@@ -50,16 +50,16 @@
          "Description":"KeyName for the EC2",
          "Type":"String"
       },
-	  "APPNAME": {
-      "Description": "Web Application Name",
-      "Type": "String",
-	  "Default":"csye6225-webapp"
-    },
-	  "DEPGROUPNAME": {
-      "Description": "Code Deploy Group Name",
-      "Type": "String",
-	  "Default":"csye6225-webapp-deployment"
-    },
+      "APPNAME":{
+         "Description":"Web Application Name",
+         "Type":"String",
+         "Default":"csye6225-webapp"
+      },
+      "DEPGROUPNAME":{
+         "Description":"Code Deploy Group Name",
+         "Type":"String",
+         "Default":"csye6225-webapp-deployment"
+      },
       "myBucketNameForWebApp":{
          "Description":"Bucket name for storing application",
          "Type":"String",
@@ -815,15 +815,15 @@
             "RoleName":"CodeDeployServiceRole"
          }
       },
-	  "WebappApplication": {
-      "Type": "AWS::CodeDeploy::Application",
-      "Properties": {
-        "ApplicationName": {
-          "Ref": "APPNAME"
-        },
-        "ComputePlatform": "Server"
-      }
-    },
+      "WebappApplication":{
+         "Type":"AWS::CodeDeploy::Application",
+         "Properties":{
+            "ApplicationName":{
+               "Ref":"APPNAME"
+            },
+            "ComputePlatform":"Server"
+         }
+      },
       "WebappDeploymentGroup":{
          "Type":"AWS::CodeDeploy::DeploymentGroup",
          "DependsOn":"CodeDeployServiceRole",
@@ -843,8 +843,8 @@
                {
                   "Key":"Name",
                   "Value":{
-				  "Ref": "APPNAME"
-				  },
+                     "Ref":"APPNAME"
+                  },
                   "Type":"KEY_AND_VALUE"
                }
             ],
@@ -855,7 +855,10 @@
                ]
             },
             "ServiceRoleArn":{
-               "Fn::Sub":"arn:aws:iam::${AWS::AccountId}:role/CodeDeployServiceRole"
+               "Fn::GetAtt":[
+                  "CodeDeployServiceRole",
+                  "Arn"
+               ]
             }
          }
       },
