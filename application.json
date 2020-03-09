@@ -842,7 +842,9 @@
             "Ec2TagFilters":[
                {
                   "Key":"Name",
-                  "Value":"EC2Webapplication",
+                  "Value":{
+				  "Ref": "APPNAME"
+				  },
                   "Type":"KEY_AND_VALUE"
                }
             ],
