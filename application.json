@@ -952,8 +952,7 @@
                      [
                         "#!/bin/bash \n",
                         "set -e -x \n",
-                        "sudo service tomcat8 stop \n",
-                        "echo export SPRING_PROFILE=dev>>/etc/profile.d/envvariable.sh",
+                        "sudo echo export SPRING_PROFILE=dev>>/etc/profile.d/envvariable.sh \n",
                         "sudo echo DBCreationType=update >> /etc/profile.d/envvariable.sh \n",
                         "sudo echo export DBCreationType >> /etc/profile.d/envvariable.sh \n",
                         {
