@@ -842,9 +842,7 @@
             "Ec2TagFilters":[
                {
                   "Key":"Name",
-                  "Value":{
-                     "Ref":"APPNAME"
-                  },
+                  "Value":"EC2Webapplication",
                   "Type":"KEY_AND_VALUE"
                }
             ],
@@ -1005,19 +1003,7 @@
             "Tags":[
                {
                   "Key":"Name",
-                  "Value":{
-                     "Fn::Join":[
-                        "-",
-                        [
-                           {
-                              "Ref":"myEC2Name"
-                           },
-                           {
-                              "Ref":"VPCName"
-                           }
-                        ]
-                     ]
-                  }
+                  "Value":"EC2Webapplication"
                }
             ]
          }
