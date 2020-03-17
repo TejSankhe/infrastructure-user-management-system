@@ -586,7 +586,8 @@
                         }
                      ]
                   }
-               }
+               },
+               "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
             ]
          }
       },
