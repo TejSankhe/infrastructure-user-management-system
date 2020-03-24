@@ -112,6 +112,10 @@
       "DomainName":{
          "Type":"String",
          "Default":"dev.tejsankhe.me"
+      },
+      "VolumeSzie":{
+         "Type":"String",
+         "Default":"20"
       }
    },
    "Resources":{
