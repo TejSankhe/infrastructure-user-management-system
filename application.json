@@ -107,7 +107,7 @@
       },
       "HostedZoneId":{
          "Type":"String",
-         "Default":"Z1KNUSZP8ARKXR"
+         "Default":"ZUEGRQWKDWMKF"
       },
       "DomainName":{
          "Type":"String",
