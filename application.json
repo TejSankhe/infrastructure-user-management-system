@@ -1016,6 +1016,18 @@
                               ]
                            ]
                         },
+                        {
+                           "Fn::Join":[
+                              "",
+                              [
+                                 "echo export SNSTOPIC_ARN=",
+                                 {
+                                    "Ref":"mySNSTopic"
+                                 },
+                                 ">>/etc/profile.d/envvariable.sh"
+                              ]
+                           ]
+                        },
                         "sudo echo export DB_ENDPOINT >> /etc/profile.d/envvariable.sh \n",
                         "sudo echo export WEBAPP_BUCKETNAME >> /etc/profile.d/envvariable.sh \n"
                      ]
