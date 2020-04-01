@@ -423,8 +423,8 @@
                   "IpProtocol":"tcp",
                   "FromPort":8080,
                   "ToPort":8080,
-                  "SourceSecurityGroupId": {
-                     "Fn::GetAtt": [
+                  "SourceSecurityGroupId":{
+                     "Fn::GetAtt":[
                         "loadbalancerSecurityGroup",
                         "GroupId"
                      ]
@@ -444,38 +444,38 @@
             }
          }
       },
-      "loadbalancerSecurityGroup": {
-         "Type": "AWS::EC2::SecurityGroup",
-         "Properties": {
-            "GroupName": "LoadBalancer-Security-Group",
-            "GroupDescription": "Enable HTTPS via port 8080",
-            "VpcId": {
-               "Ref": "myVPC"
+      "loadbalancerSecurityGroup":{
+         "Type":"AWS::EC2::SecurityGroup",
+         "Properties":{
+            "GroupName":"LoadBalancer-Security-Group",
+            "GroupDescription":"Enable HTTPS via port 8080",
+            "VpcId":{
+               "Ref":"myVPC"
             },
-            "SecurityGroupIngress": [
+            "SecurityGroupIngress":[
                {
-                  "IpProtocol": "tcp",
-                  "FromPort": 80,
-                  "ToPort": 80,
-                  "CidrIp": "0.0.0.0/0"
+                  "IpProtocol":"tcp",
+                  "FromPort":80,
+                  "ToPort":80,
+                  "CidrIp":"0.0.0.0/0"
                },
                {
-                  "IpProtocol": "tcp",
-                  "FromPort": 443,
-                  "ToPort": 443,
-                  "CidrIp": "0.0.0.0/0"
+                  "IpProtocol":"tcp",
+                  "FromPort":443,
+                  "ToPort":443,
+                  "CidrIp":"0.0.0.0/0"
                },
                {
-                  "IpProtocol": "tcp",
-                  "FromPort": 8080,
-                  "ToPort": 8080,
-                  "CidrIp": "0.0.0.0/0"
+                  "IpProtocol":"tcp",
+                  "FromPort":8080,
+                  "ToPort":8080,
+                  "CidrIp":"0.0.0.0/0"
                },
                {
-                  "IpProtocol": "tcp",
-                  "FromPort": 22,
-                  "ToPort": 22,
-                  "CidrIp": "0.0.0.0/0"
+                  "IpProtocol":"tcp",
+                  "FromPort":22,
+                  "ToPort":22,
+                  "CidrIp":"0.0.0.0/0"
                }
             ]
          }
@@ -625,7 +625,9 @@
                {
                   "Ref":"AccessAttachmentToS3Bucket"
                },
-               "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+               "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy",
+               "arn:aws:iam::aws:policy/AmazonSQSFullAccess",
+               "arn:aws:iam::aws:policy/AmazonSNSFullAccess"
             ],
             "AssumeRolePolicyDocument":{
                "Version":"2012-10-17",
@@ -982,6 +984,10 @@
                         {
                            "Fn::Sub":"sudo echo DB_PASSWORD=${dbuserPassword} >> /etc/profile.d/envvariable.sh \n"
                         },
+                        {
+                           "Fn::Sub":"sudo echo DOMAIN_NAME=${DomainName} >> /etc/profile.d/envvariable.sh \n"
+                        },
+                        "sudo echo export DOMAIN_NAME >> /etc/profile.d/envvariable.sh \n",
                         "sudo echo export DB_PASSWORD >> /etc/profile.d/envvariable.sh \n",
                         {
                            "Fn::Join":[
@@ -1130,7 +1136,7 @@
             "MetricName":"CPUUtilization",
             "Namespace":"AWS/EC2",
             "Statistic":"Average",
-            "Period":"60",
+            "Period":"300",
             "EvaluationPeriods":"2",
             "Threshold":"5",
             "AlarmActions":[
@@ -1156,7 +1162,7 @@
             "MetricName":"CPUUtilization",
             "Namespace":"AWS/EC2",
             "Statistic":"Average",
-            "Period":"60",
+            "Period":"300",
             "EvaluationPeriods":"2",
             "Threshold":"3",
             "AlarmActions":[
@@ -1265,6 +1271,20 @@
                   "Ref":"databaseSecurityGroup"
                }
             ]
+         }
+      },
+      "mySQSQueue":{
+         "Type":"AWS::SQS::Queue",
+         "Properties":{
+            "FifoQueue":"true",
+            "QueueName":"mySQSQueue.fifo"
+         }
+      },
+      "mySNSTopic":{
+         "Type":"AWS::SNS::Topic",
+         "Properties":{
+            "DisplayName":"mySNSTopic",
+            "TopicName":"mySNSTopic"
          }
       }
    },
