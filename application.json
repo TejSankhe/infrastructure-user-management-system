@@ -1288,15 +1288,125 @@
       "mySQSQueue":{
          "Type":"AWS::SQS::Queue",
          "Properties":{
-            "FifoQueue":"true",
-            "QueueName":"mySQSQueue.fifo"
+            "QueueName":"mySQSQueue"
          }
       },
       "mySNSTopic":{
          "Type":"AWS::SNS::Topic",
          "Properties":{
             "DisplayName":"mySNSTopic",
-            "TopicName":"mySNSTopic"
+            "TopicName":"mySNSTopic",
+            "Subscription":[
+               {
+                  "Endpoint":{
+                     "Fn::GetAtt":[
+                        "lambdaFunction",
+                        "Arn"
+                     ]
+                  },
+                  "Protocol":"lambda"
+               }
+            ]
+         }
+      },
+      "lambdaExecutionRole":{
+         "Type":"AWS::IAM::Role",
+         "Properties":{
+            "RoleName":"lambdaRole",
+            "AssumeRolePolicyDocument":{
+               "Version":"2012-10-17",
+               "Statement":[
+                  {
+                     "Effect":"Allow",
+                     "Principal":{
+                        "Service":[
+                           "lambda.amazonaws.com"
+                        ]
+                     },
+                     "Action":[
+                        "sts:AssumeRole"
+                     ]
+                  }
+               ]
+            },
+            "ManagedPolicyArns":[
+               "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+               "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess",
+               "arn:aws:iam::aws:policy/AmazonS3FullAccess",
+               "arn:aws:iam::aws:policy/AmazonSNSFullAccess",
+               "arn:aws:iam::aws:policy/AmazonSESFullAccess"
+            ]
+         }
+      },
+      "lambdaPermission":{
+         "Type":"AWS::Lambda::Permission",
+         "Properties":{
+            "Action":"lambda:*",
+            "FunctionName":{
+               "Fn::GetAtt":[
+                  "lambdaFunction",
+                  "Arn"
+               ]
+            },
+            "Principal":"sns.amazonaws.com",
+            "SourceArn":{
+               "Ref":"mySNSTopic"
+            }
+         }
+      },
+      "lambdaFunction":{
+         "Type":"AWS::Lambda::Function",
+         "Properties":{
+            "FunctionName":"SendEmail",
+            "MemorySize":512,
+            "Environment":{
+               "Variables":{
+                  "DomainName":{
+                     "Ref":"DomainName"
+                  }
+               }
+            },
+            "Code":{
+               "S3Bucket":{
+                  "Ref":"myBucketNameForWebApp"
+               },
+               "S3Key":"lambda-0.0.1-SNAPSHOT.jar"
+            },
+            "Role":{
+               "Fn::GetAtt":[
+                  "lambdaExecutionRole",
+                  "Arn"
+               ]
+            },
+            "Timeout":90,
+            "Handler":"lambda.SendEmails::handleRequest",
+            "Runtime":"java8"
+         }
+      },
+      "DynamoDBTable":{
+         "Type":"AWS::DynamoDB::Table",
+         "Properties":{
+            "AttributeDefinitions":[
+               {
+                  "AttributeName":"EmailAddress",
+                  "AttributeType":"S"
+               }
+            ],
+            "KeySchema":[
+               {
+                  "AttributeName":"EmailAddress",
+                  "KeyType":"HASH"
+               }
+            ],
+            "ProvisionedThroughput":{
+               "ReadCapacityUnits":"5",
+               "WriteCapacityUnits":"5"
+            },
+            "TableName":"sendEmailcsye6225DynamoDB",
+            "TimeToLiveSpecification":{
+               "AttributeName":"TTL",
+               "Enabled":true
+            }
          }
       }
    },
