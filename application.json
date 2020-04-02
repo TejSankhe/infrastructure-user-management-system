@@ -849,6 +849,60 @@
             ]
          }
       },
+      "CirlceCILambda":{
+         "Type":"AWS::IAM::Policy",
+         "Properties":{
+            "PolicyName":"CirlceCI-Lambda",
+            "PolicyDocument":{
+               "Version":"2012-10-17",
+               "Statement":[
+                  {
+                     "Effect":"Allow",
+                     "Action":[
+                        "lambda:*",
+                        "iam:PassRole"
+                     ],
+                     "Resource":"*"
+                  }
+               ]
+            },
+            "Users":[
+               "circleci"
+            ]
+         }
+      },
+      "CirlceCILambdaS3":{
+         "Type":"AWS::IAM::Policy",
+         "Properties":{
+            "PolicyName":"CirlceCI-Lamda-Get-From-S3",
+            "PolicyDocument":{
+               "Version":"2012-10-17",
+               "Statement":[
+                  {
+                     "Effect":"Allow",
+                     "Action":[
+                        "s3:GetObject"
+                     ],
+                     "Resource":{
+                        "Fn::Join":[
+                           "",
+                           [
+                              "arn:aws:s3:::",
+                              {
+                                 "Ref":"myBucketNameForWebApp"
+                              },
+                              "/*"
+                           ]
+                        ]
+                     }
+                  }
+               ]
+            },
+            "Users":[
+               "circleci"
+            ]
+         }
+      },
       "CodeDeployServiceRole":{
          "Type":"AWS::IAM::Role",
          "Properties":{
