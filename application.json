@@ -1424,7 +1424,7 @@
                "S3Bucket":{
                   "Ref":"myBucketNameForWebApp"
                },
-               "S3Key":"lambda-0.0.1-SNAPSHOT.jar"
+               "S3Key":"lambda-1.0-SNAPSHOT.zip"
             },
             "Role":{
                "Fn::GetAtt":[
