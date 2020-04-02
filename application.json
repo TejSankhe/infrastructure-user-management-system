@@ -423,8 +423,8 @@
                   "IpProtocol":"tcp",
                   "FromPort":8080,
                   "ToPort":8080,
-                  "SourceSecurityGroupId": {
-                     "Fn::GetAtt": [
+                  "SourceSecurityGroupId":{
+                     "Fn::GetAtt":[
                         "loadbalancerSecurityGroup",
                         "GroupId"
                      ]
@@ -444,38 +444,38 @@
             }
          }
       },
-      "loadbalancerSecurityGroup": {
-         "Type": "AWS::EC2::SecurityGroup",
-         "Properties": {
-            "GroupName": "LoadBalancer-Security-Group",
-            "GroupDescription": "Enable HTTPS via port 8080",
-            "VpcId": {
-               "Ref": "myVPC"
+      "loadbalancerSecurityGroup":{
+         "Type":"AWS::EC2::SecurityGroup",
+         "Properties":{
+            "GroupName":"LoadBalancer-Security-Group",
+            "GroupDescription":"Enable HTTPS via port 8080",
+            "VpcId":{
+               "Ref":"myVPC"
             },
-            "SecurityGroupIngress": [
+            "SecurityGroupIngress":[
                {
-                  "IpProtocol": "tcp",
-                  "FromPort": 80,
-                  "ToPort": 80,
-                  "CidrIp": "0.0.0.0/0"
+                  "IpProtocol":"tcp",
+                  "FromPort":80,
+                  "ToPort":80,
+                  "CidrIp":"0.0.0.0/0"
                },
                {
-                  "IpProtocol": "tcp",
-                  "FromPort": 443,
-                  "ToPort": 443,
-                  "CidrIp": "0.0.0.0/0"
+                  "IpProtocol":"tcp",
+                  "FromPort":443,
+                  "ToPort":443,
+                  "CidrIp":"0.0.0.0/0"
                },
                {
-                  "IpProtocol": "tcp",
-                  "FromPort": 8080,
-                  "ToPort": 8080,
-                  "CidrIp": "0.0.0.0/0"
+                  "IpProtocol":"tcp",
+                  "FromPort":8080,
+                  "ToPort":8080,
+                  "CidrIp":"0.0.0.0/0"
                },
                {
-                  "IpProtocol": "tcp",
-                  "FromPort": 22,
-                  "ToPort": 22,
-                  "CidrIp": "0.0.0.0/0"
+                  "IpProtocol":"tcp",
+                  "FromPort":22,
+                  "ToPort":22,
+                  "CidrIp":"0.0.0.0/0"
                }
             ]
          }
@@ -625,7 +625,9 @@
                {
                   "Ref":"AccessAttachmentToS3Bucket"
                },
-               "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+               "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy",
+               "arn:aws:iam::aws:policy/AmazonSQSFullAccess",
+               "arn:aws:iam::aws:policy/AmazonSNSFullAccess"
             ],
             "AssumeRolePolicyDocument":{
                "Version":"2012-10-17",
@@ -847,6 +849,60 @@
             ]
          }
       },
+      "CirlceCILambda":{
+         "Type":"AWS::IAM::Policy",
+         "Properties":{
+            "PolicyName":"CirlceCI-Lambda",
+            "PolicyDocument":{
+               "Version":"2012-10-17",
+               "Statement":[
+                  {
+                     "Effect":"Allow",
+                     "Action":[
+                        "lambda:*",
+                        "iam:PassRole"
+                     ],
+                     "Resource":"*"
+                  }
+               ]
+            },
+            "Users":[
+               "circleci"
+            ]
+         }
+      },
+      "CirlceCILambdaS3":{
+         "Type":"AWS::IAM::Policy",
+         "Properties":{
+            "PolicyName":"CirlceCI-Lamda-Get-From-S3",
+            "PolicyDocument":{
+               "Version":"2012-10-17",
+               "Statement":[
+                  {
+                     "Effect":"Allow",
+                     "Action":[
+                        "s3:GetObject"
+                     ],
+                     "Resource":{
+                        "Fn::Join":[
+                           "",
+                           [
+                              "arn:aws:s3:::",
+                              {
+                                 "Ref":"myBucketNameForWebApp"
+                              },
+                              "/*"
+                           ]
+                        ]
+                     }
+                  }
+               ]
+            },
+            "Users":[
+               "circleci"
+            ]
+         }
+      },
       "CodeDeployServiceRole":{
          "Type":"AWS::IAM::Role",
          "Properties":{
@@ -982,6 +1038,10 @@
                         {
                            "Fn::Sub":"sudo echo DB_PASSWORD=${dbuserPassword} >> /etc/profile.d/envvariable.sh \n"
                         },
+                        {
+                           "Fn::Sub":"sudo echo DOMAIN_NAME=${DomainName} >> /etc/profile.d/envvariable.sh \n"
+                        },
+                        "sudo echo export DOMAIN_NAME >> /etc/profile.d/envvariable.sh \n",
                         "sudo echo export DB_PASSWORD >> /etc/profile.d/envvariable.sh \n",
                         {
                            "Fn::Join":[
@@ -1007,6 +1067,18 @@
                                     "Ref":"myS3Bucket"
                                  },
                                  ">> /etc/profile.d/envvariable.sh \n"
+                              ]
+                           ]
+                        },
+                        {
+                           "Fn::Join":[
+                              "",
+                              [
+                                 "echo export SNSTOPIC_ARN=",
+                                 {
+                                    "Ref":"mySNSTopic"
+                                 },
+                                 ">>/etc/profile.d/envvariable.sh"
                               ]
                            ]
                         },
@@ -1130,7 +1202,7 @@
             "MetricName":"CPUUtilization",
             "Namespace":"AWS/EC2",
             "Statistic":"Average",
-            "Period":"60",
+            "Period":"300",
             "EvaluationPeriods":"2",
             "Threshold":"5",
             "AlarmActions":[
@@ -1156,7 +1228,7 @@
             "MetricName":"CPUUtilization",
             "Namespace":"AWS/EC2",
             "Statistic":"Average",
-            "Period":"60",
+            "Period":"300",
             "EvaluationPeriods":"2",
             "Threshold":"3",
             "AlarmActions":[
@@ -1265,6 +1337,130 @@
                   "Ref":"databaseSecurityGroup"
                }
             ]
+         }
+      },
+      "mySQSQueue":{
+         "Type":"AWS::SQS::Queue",
+         "Properties":{
+            "QueueName":"mySQSQueue"
+         }
+      },
+      "mySNSTopic":{
+         "Type":"AWS::SNS::Topic",
+         "Properties":{
+            "DisplayName":"mySNSTopic",
+            "TopicName":"mySNSTopic",
+            "Subscription":[
+               {
+                  "Endpoint":{
+                     "Fn::GetAtt":[
+                        "lambdaFunction",
+                        "Arn"
+                     ]
+                  },
+                  "Protocol":"lambda"
+               }
+            ]
+         }
+      },
+      "lambdaExecutionRole":{
+         "Type":"AWS::IAM::Role",
+         "Properties":{
+            "RoleName":"lambdaRole",
+            "AssumeRolePolicyDocument":{
+               "Version":"2012-10-17",
+               "Statement":[
+                  {
+                     "Effect":"Allow",
+                     "Principal":{
+                        "Service":[
+                           "lambda.amazonaws.com"
+                        ]
+                     },
+                     "Action":[
+                        "sts:AssumeRole"
+                     ]
+                  }
+               ]
+            },
+            "ManagedPolicyArns":[
+               "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+               "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess",
+               "arn:aws:iam::aws:policy/AmazonS3FullAccess",
+               "arn:aws:iam::aws:policy/AmazonSNSFullAccess",
+               "arn:aws:iam::aws:policy/AmazonSESFullAccess"
+            ]
+         }
+      },
+      "lambdaPermission":{
+         "Type":"AWS::Lambda::Permission",
+         "Properties":{
+            "Action":"lambda:*",
+            "FunctionName":{
+               "Fn::GetAtt":[
+                  "lambdaFunction",
+                  "Arn"
+               ]
+            },
+            "Principal":"sns.amazonaws.com",
+            "SourceArn":{
+               "Ref":"mySNSTopic"
+            }
+         }
+      },
+      "lambdaFunction":{
+         "Type":"AWS::Lambda::Function",
+         "Properties":{
+            "FunctionName":"SendEmail",
+            "MemorySize":512,
+            "Environment":{
+               "Variables":{
+                  "DomainName":{
+                     "Ref":"DomainName"
+                  }
+               }
+            },
+            "Code":{
+               "S3Bucket":{
+                  "Ref":"myBucketNameForWebApp"
+               },
+               "S3Key":"lambda-0.0.1-SNAPSHOT.jar"
+            },
+            "Role":{
+               "Fn::GetAtt":[
+                  "lambdaExecutionRole",
+                  "Arn"
+               ]
+            },
+            "Timeout":90,
+            "Handler":"lambda.SendEmails::handleRequest",
+            "Runtime":"java8"
+         }
+      },
+      "DynamoDBTable":{
+         "Type":"AWS::DynamoDB::Table",
+         "Properties":{
+            "AttributeDefinitions":[
+               {
+                  "AttributeName":"EmailAddress",
+                  "AttributeType":"S"
+               }
+            ],
+            "KeySchema":[
+               {
+                  "AttributeName":"EmailAddress",
+                  "KeyType":"HASH"
+               }
+            ],
+            "ProvisionedThroughput":{
+               "ReadCapacityUnits":"5",
+               "WriteCapacityUnits":"5"
+            },
+            "TableName":"sendEmailcsye6225DynamoDB",
+            "TimeToLiveSpecification":{
+               "AttributeName":"TTL",
+               "Enabled":true
+            }
          }
       }
    },
