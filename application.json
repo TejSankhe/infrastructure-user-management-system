@@ -116,6 +116,9 @@
       "VolumeSzie":{
          "Type":"String",
          "Default":"20"
+      },
+      "DomainCertificateARN":{
+         "Type":"String"
       }
    },
    "Resources":{
@@ -1287,8 +1290,15 @@
             "LoadBalancerArn":{
                "Ref":"MyLoadBalancer"
             },
-            "Port":80,
-            "Protocol":"HTTP"
+            "Port":443,
+            "Protocol":"HTTPS",
+            "Certificates":[
+               {
+                  "CertificateArn":{
+                     "Ref":"DomainCertificateARN"
+                  }
+               }
+            ]
          }
       },
       "myDBSubnetGroup":{
@@ -1336,7 +1346,8 @@
                {
                   "Ref":"databaseSecurityGroup"
                }
-            ]
+            ],
+            "StorageEncrypted":true
          }
       },
       "mySQSQueue":{
