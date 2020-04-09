@@ -1312,6 +1312,22 @@
             ]
          }
       },
+      "RDSDBParameterGroup":{
+         "Type":"AWS::RDS::DBParameterGroup",
+         "Properties":{
+            "Description":"Database Parameter Group for RDS Postgres Instance",
+            "Family":"postgres10",
+            "Parameters":{
+               "rds.force_ssl":"1"
+            },
+            "Tags":[
+               {
+                  "Key":"Name",
+                  "Value":"RDSDBParameterGroup"
+               }
+            ]
+         }
+      },
       "myRDS":{
          "Type":"AWS::RDS::DBInstance",
          "Properties":{
@@ -1322,6 +1338,9 @@
             "MultiAZ":false,
             "DBInstanceIdentifier":{
                "Ref":"dbIdentifier"
+            },
+            "DbParameter":{
+               "Ref":"RDSDbParameterGroup"
             },
             "MasterUsername":{
                "Ref":"dbUserName"
