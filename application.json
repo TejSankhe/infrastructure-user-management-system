@@ -1339,8 +1339,8 @@
             "DBInstanceIdentifier":{
                "Ref":"dbIdentifier"
             },
-            "DbParameter":{
-               "Ref":"RDSDbParameterGroup"
+            "DbParameterGroupName":{
+               "Ref":"RDSDBParameterGroup"
             },
             "MasterUsername":{
                "Ref":"dbUserName"
